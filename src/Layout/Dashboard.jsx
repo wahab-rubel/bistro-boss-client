@@ -1,99 +1,49 @@
-import { FaAd, FaBook, FaCalendar, FaEnvelope, FaHome, FaList, FaSearch, FaShoppingCart, FaUsers, FaUtensils } from "react-icons/fa";
+import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { FaBars, FaHome, FaUtensils, FaList, FaUsers, FaShoppingCart, FaAd, FaMoon, FaSun } from "react-icons/fa";
 import useCart from "../hooks/useCart";
 import useAdmin from "../hooks/useAdmin";
 
-
 const Dashboard = () => {
     const [cart] = useCart();
-
-    // TODO: get isAdmin value from the database
     const [isAdmin] = useAdmin();
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [darkMode, setDarkMode] = useState(false);
 
     return (
-        <div className="flex">
-            {/* dashboard side bar */}
-            <div className="w-64 min-h-screen bg-orange-400">
-                <ul className="menu p-4">
-                    {
-                        isAdmin ? <>
-                            <li>
-                                <NavLink to="/dashboard/adminHome">
-                                    <FaHome></FaHome>
-                                    Admin Home</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/dashboard/addItems">
-                                    <FaUtensils></FaUtensils>
-                                    Add Items</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/dashboard/manageItems">
-                                    <FaList></FaList>
-                                    Manage Items</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/dashboard/bookings">
-                                    <FaBook></FaBook>
-                                    Manage Bookings</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/dashboard/users">
-                                    <FaUsers></FaUsers>
-                                    All Users</NavLink>
-                            </li>
+        <div className={`flex min-h-screen ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
+            {/* Sidebar */}
+            <div className={`h-screen p-5 transition-all duration-300 ${isCollapsed ? "w-20" : "w-64"} bg-opacity-80 backdrop-blur-md bg-gray-800 text-white shadow-lg`}> 
+                <button className="mb-4 text-xl" onClick={() => setIsCollapsed(!isCollapsed)}>
+                    <FaBars />
+                </button>
+                <ul className="space-y-4">
+                    {isAdmin ? (
+                        <>
+                            <li><NavLink to="/dashboard/adminHome" className="flex items-center gap-2 hover:text-yellow-400"><FaHome /> {!isCollapsed && "Admin Home"}</NavLink></li>
+                            <li><NavLink to="/dashboard/addItems" className="flex items-center gap-2 hover:text-yellow-400"><FaUtensils /> {!isCollapsed && "Add Items"}</NavLink></li>
+                            <li><NavLink to="/dashboard/manageItems" className="flex items-center gap-2 hover:text-yellow-400"><FaList /> {!isCollapsed && "Manage Items"}</NavLink></li>
+                            <li><NavLink to="/dashboard/users" className="flex items-center gap-2 hover:text-yellow-400"><FaUsers /> {!isCollapsed && "All Users"}</NavLink></li>
                         </>
-                            :
-                            <>
-                                <li>
-                                    <NavLink to="/dashboard/userHome">
-                                        <FaHome></FaHome>
-                                        User Home</NavLink>
-                                </li>
-                                <li>
-                                    <NavLink to="/dashboard/history">
-                                        <FaCalendar></FaCalendar>
-                                        Not History</NavLink>
-                                </li>
-                                <li>
-                                    <NavLink to="/dashboard/cart">
-                                        <FaShoppingCart></FaShoppingCart>
-                                        My Cart ({cart.length})</NavLink>
-                                </li>
-                                <li>
-                                    <NavLink to="/dashboard/review">
-                                        <FaAd></FaAd>
-                                        Add a Review</NavLink>
-                                </li>
-                                <li>
-                                    <NavLink to="/dashboard/paymentHistory">
-                                        <FaList></FaList>
-                                        Real Payment History</NavLink>
-                                </li>
-                            </>
-                    }
-                    {/* shared nav links */}
+                    ) : (
+                        <>
+                            <li><NavLink to="/dashboard/userHome" className="flex items-center gap-2 hover:text-yellow-400"><FaHome /> {!isCollapsed && "User Home"}</NavLink></li>
+                            <li><NavLink to="/dashboard/cart" className="flex items-center gap-2 hover:text-yellow-400"><FaShoppingCart /> {!isCollapsed && `My Cart (${cart.length})`}</NavLink></li>
+                            <li><NavLink to="/dashboard/review" className="flex items-center gap-2 hover:text-yellow-400"><FaAd /> {!isCollapsed && "Add a Review"}</NavLink></li>
+                        </>
+                    )}
                     <div className="divider"></div>
-                    <li>
-                        <NavLink to="/">
-                            <FaHome></FaHome>
-                            Home</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/order/salad">
-                            <FaSearch></FaSearch>
-                            Menu</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to="/order/contact">
-                            <FaEnvelope></FaEnvelope>
-                            Contact</NavLink>
-                    </li>
+                    <li><NavLink to="/" className="flex items-center gap-2 hover:text-yellow-400"><FaHome /> {!isCollapsed && "Home"}</NavLink></li>
+                    <li><NavLink to="/order/menu" className="flex items-center gap-2 hover:text-yellow-400"><FaList /> {!isCollapsed && "Menu"}</NavLink></li>
+                    <li><NavLink to="/order/contact" className="flex items-center gap-2 hover:text-yellow-400"><FaUtensils /> {!isCollapsed && "Contact"}</NavLink></li>
+                    <button className="flex items-center gap-2 mt-4" onClick={() => setDarkMode(!darkMode)}>
+                        {darkMode ? <FaSun /> : <FaMoon />} {!isCollapsed && (darkMode ? "Light Mode" : "Dark Mode")}
+                    </button>
                 </ul>
             </div>
-            {/* dashboard content */}
-            <div className="flex-1 p-8">
-                <Outlet></Outlet>
+            {/* Main Content */}
+            <div className="flex-1 p-8 transition-all duration-300">
+                <Outlet />
             </div>
         </div>
     );

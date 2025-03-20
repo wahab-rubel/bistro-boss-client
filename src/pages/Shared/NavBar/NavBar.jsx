@@ -1,7 +1,7 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../providers/AuthProvider";
-import { FaShoppingCart } from 'react-icons/fa';
+import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
 import useCart from "../../../hooks/useCart";
 import useAdmin from "../../../hooks/useAdmin";
 
@@ -9,69 +9,70 @@ const NavBar = () => {
     const { user, logOut } = useContext(AuthContext);
     const [isAdmin] = useAdmin();
     const [cart] = useCart();
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const handleLogOut = () => {
-        logOut()
-            .then(() => { })
-            .catch(error => console.log(error));
-    }
-
-    const navOptions = <>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/menu">Our Menu</Link></li>
-        <li><Link to="/order/salad">Order Food</Link></li>
-        {
-            // user ? 'true': 'false'
-            // user ? condition ? 'double true' : 'one true' : 'false' 
-        }
-        {
-            user && isAdmin && <li><Link to="/dashboard/adminHome">Dashboard</Link></li>
-        }
-        {
-            user && !isAdmin && <li><Link to="/dashboard/userHome">Dashboard</Link></li>
-        }
-        <li>
-            <Link to="/dashboard/cart">
-                <button className="btn">
-                    <FaShoppingCart className="mr-2"></FaShoppingCart>
-                    <div className="badge badge-secondary">+{cart.length}</div>
-                </button>
-            </Link>
-        </li>
-        {
-            user ? <>
-                {/* <span>{user?.displayName}</span> */}
-                <button onClick={handleLogOut} className="btn btn-ghost">LogOut</button>
-            </> : <>
-                <li><Link to="/login">Login</Link></li>
-            </>
-        }
-    </>
+        logOut().catch(error => console.log(error));
+    };
 
     return (
-        <>
-            <div className="navbar fixed z-10 bg-opacity-30 max-w-screen-xl bg-black text-white">
-                <div className="navbar-start">
-                    <div className="dropdown">
-                        <label tabIndex={0} className="btn btn-ghost lg:hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
-                        </label>
-                        <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                            {navOptions}
-                        </ul>
-                    </div>
-                    <a className="btn btn-ghost normal-case text-xl">Bistro Boss</a>
+        <nav className="fixed top-0 left-0 w-full backdrop-blur-md bg-opacity-80 bg-gray-900 text-white shadow-lg z-50">
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+                {/* Logo */}
+                <Link to="/" className="text-3xl font-extrabold text-yellow-400 tracking-wide">
+                    Bistro Boss
+                </Link>
+                
+                {/* Desktop Navigation */}
+                <ul className="hidden lg:flex space-x-6 text-lg">
+                    <li><Link to="/" className="hover:text-yellow-400 transition-all">Home</Link></li>
+                    <li><Link to="/menu" className="hover:text-yellow-400 transition-all">Our Menu</Link></li>
+                    <li><Link to="/order/salad" className="hover:text-yellow-400 transition-all">Order Food</Link></li>
+                    {user && isAdmin && <li><Link to="/dashboard/adminHome" className="hover:text-yellow-400">Dashboard</Link></li>}
+                    {user && !isAdmin && <li><Link to="/dashboard/userHome" className="hover:text-yellow-400">Dashboard</Link></li>}
+                </ul>
+                
+                {/* Cart & User Actions */}
+                <div className="flex items-center space-x-6">
+                    <Link to="/dashboard/cart" className="relative">
+                        <FaShoppingCart className="text-2xl hover:text-yellow-400 transition-all" />
+                        {cart.length > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                                {cart.length}
+                            </span>
+                        )}
+                    </Link>
+                    {user ? (
+                        <button
+                            onClick={handleLogOut}
+                            className="bg-red-500 hover:bg-red-600 transition-all text-white px-4 py-2 rounded-md shadow-lg"
+                        >
+                            Log Out
+                        </button>
+                    ) : (
+                        <Link to="/login" className="bg-yellow-400 hover:bg-yellow-500 transition-all text-black px-4 py-2 rounded-md shadow-lg">
+                            Login
+                        </Link>
+                    )}
                 </div>
-                <div className="navbar-center hidden lg:flex">
-                    <ul className="menu menu-horizontal px-1">
-                        {navOptions}
-                    </ul>
-                </div>
-                <div className="navbar-end">
-                    <a className="btn">Get started</a>
-                </div>
+                
+                {/* Mobile Menu Button */}
+                <button className="lg:hidden text-2xl" onClick={() => setMenuOpen(!menuOpen)}>
+                    {menuOpen ? <FaTimes /> : <FaBars />}
+                </button>
             </div>
-        </>
+
+            {/* Mobile Menu */}
+            {menuOpen && (
+                <ul className="lg:hidden flex flex-col items-center bg-gray-800 w-full py-4 space-y-4">
+                    <li><Link to="/" className="hover:text-yellow-400 transition-all">Home</Link></li>
+                    <li><Link to="/menu" className="hover:text-yellow-400 transition-all">Our Menu</Link></li>
+                    <li><Link to="/order/salad" className="hover:text-yellow-400 transition-all">Order Food</Link></li>
+                    {user && isAdmin && <li><Link to="/dashboard/adminHome" className="hover:text-yellow-400">Dashboard</Link></li>}
+                    {user && !isAdmin && <li><Link to="/dashboard/userHome" className="hover:text-yellow-400">Dashboard</Link></li>}
+                </ul>
+            )}
+        </nav>
     );
 };
 
